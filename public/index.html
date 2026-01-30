@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Timeclock</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="screen">
+      <section class="card" id="auth-card">
+        <h1>Enter PIN</h1>
+        <p class="muted">Use your PIN to access punch actions.</p>
+        <form id="pin-form">
+          <label class="field">
+            <span>PIN</span>
+            <input
+              id="pin-input"
+              type="password"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              minlength="4"
+              maxlength="8"
+              required
+            />
+          </label>
+          <button type="submit" class="primary">Continue</button>
+          <p class="message" id="pin-message" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="card hidden" id="status-card">
+        <div class="status-header">
+          <div>
+            <h1 id="status-title">Status</h1>
+            <p class="muted" id="status-subtitle"></p>
+          </div>
+          <button type="button" id="logout" class="ghost">Change PIN</button>
+        </div>
+        <div class="status-indicator" id="status-indicator">OUT</div>
+        <button type="button" class="primary" id="action-button"></button>
+        <p class="message" id="action-message" aria-live="polite"></p>
+      </section>
+
+      <section class="card hidden" id="note-card">
+        <h1 id="note-title">Add a note</h1>
+        <p class="muted">Optional: record details for this punch.</p>
+        <form id="note-form">
+          <label class="field">
+            <span>Note</span>
+            <textarea id="note-input" rows="3" placeholder="Optional note..."></textarea>
+          </label>
+          <button type="submit" class="primary">Submit Punch</button>
+          <button type="button" id="note-cancel" class="ghost">Cancel</button>
+          <p class="message" id="note-message" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
