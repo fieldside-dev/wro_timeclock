@@ -1,0 +1,14 @@
+name = "wro-timeclock-api"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[vars]
+TIMEZONE = "America/Toronto"
+PAY_PERIOD_ANCHOR_DATE = "2026-01-02"
+PAYROLL_RECIPIENTS = "payroll@example.com"
+EMAIL_FROM = "timeclock@example.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "timeclock_db"
+database_id = "REPLACE_WITH_REMOTE_DATABASE_ID"
