@@ -1,0 +1,14 @@
+{
+  "name": "wro_timeclock",
+  "version": "1.0.0",
+  "description": "Timeclock shift derivation and reporting service",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "luxon": "^3.4.4"
+  }
+}

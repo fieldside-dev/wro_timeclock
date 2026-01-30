@@ -1,0 +1,50 @@
+[
+  {
+    "id": "evt_1001",
+    "userId": "user_1",
+    "userName": "Alex Rivera",
+    "timestamp": "2024-05-01T12:00:00Z",
+    "type": "IN",
+    "note": "Opened store"
+  },
+  {
+    "id": "evt_1002",
+    "userId": "user_1",
+    "userName": "Alex Rivera",
+    "timestamp": "2024-05-01T20:15:00Z",
+    "type": "OUT",
+    "note": "Closed store"
+  },
+  {
+    "id": "evt_1003",
+    "userId": "user_2",
+    "userName": "Jamie Chen",
+    "timestamp": "2024-05-02T13:00:00Z",
+    "type": "IN",
+    "note": "Front desk"
+  },
+  {
+    "id": "evt_1004",
+    "userId": "user_2",
+    "userName": "Jamie Chen",
+    "timestamp": "2024-05-02T17:30:00Z",
+    "type": "OUT",
+    "note": "Shift complete"
+  },
+  {
+    "id": "evt_1005",
+    "userId": "user_1",
+    "userName": "Alex Rivera",
+    "timestamp": "2024-05-03T12:00:00Z",
+    "type": "IN",
+    "note": "Inventory"
+  },
+  {
+    "id": "evt_1006",
+    "userId": "user_3",
+    "userName": "Morgan Lee",
+    "timestamp": "2024-05-03T18:30:00Z",
+    "type": "OUT",
+    "note": "Forgot to clock in"
+  }
+]
