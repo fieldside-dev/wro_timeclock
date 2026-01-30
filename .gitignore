@@ -1,4 +1,7 @@
 node_modules/
+.wrangler/
+dist/
+.env
 .env
 coverage/
 data/punch_events.jsonl
