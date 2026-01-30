@@ -1,0 +1,4 @@
+TIMEZONE=America/Toronto
+PAY_PERIOD_ANCHOR_DATE=2026-01-02
+PAYROLL_RECIPIENTS=payroll@example.com,hr@example.com
+EMAIL_FROM=timeclock@example.com

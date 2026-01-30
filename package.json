@@ -1,10 +1,10 @@
 {
-  "name": "wro_timeclock",
-  "version": "1.0.0",
+  "name": "wro-timeclock",
   "private": true,
-  "type": "module",
   "scripts": {
-    "build": "wrangler deploy --dry-run",
+    "dev:api": "wrangler dev --config apps/api/wrangler.toml",
+    "dev:web": "wrangler pages dev apps/web --port 8788",
+    "d1:local": "wrangler d1 migrations apply timeclock_db --local --config apps/api/wrangler.toml",
     "format": "prettier --write .",
     "lint": "eslint .",
     "test": "echo \"No tests specified\""

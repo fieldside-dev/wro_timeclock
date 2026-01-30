@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block content %}
+<h2>Admin Login</h2>
+<form method="post">
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" required />
+  <label for="pin">PIN</label>
+  <input type="password" id="pin" name="pin" inputmode="numeric" pattern="\d{4}" maxlength="4" required />
+  <div style="margin-top: 12px;">
+    <button class="button" type="submit">Sign in</button>
+  </div>
+</form>
+{% endblock %}

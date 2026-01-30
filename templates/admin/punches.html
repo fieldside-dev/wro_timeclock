@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Punches & Shifts{% endblock %}
+
+{% block content %}
+<h2>Punches &amp; Shifts</h2>
+<form class="filters" method="get">
+  <div>
+    <label for="start">Start date</label>
+    <input type="date" id="start" name="start" value="{{ start_date }}" />
+  </div>
+  <div>
+    <label for="end">End date</label>
+    <input type="date" id="end" name="end" value="{{ end_date }}" />
+  </div>
+  <div style="margin-top: 20px;">
+    <button class="button" type="submit">Apply</button>
+  </div>
+</form>
+
+<h3>Punches</h3>
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Direction</th>
+      <th>Time</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for punch in punches %}
+    <tr>
+      <td>{{ punch.user_name }}</td>
+      <td>{{ punch.direction }}</td>
+      <td>{{ punch.punched_at }}</td>
+    </tr>
+  {% else %}
+    <tr>
+      <td colspan="3">No punches in range.</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h3>Derived Shifts</h3>
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Start</th>
+      <th>End</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for shift in shifts %}
+    <tr>
+      <td>{{ shift.user_name }}</td>
+      <td>{{ shift.start }}</td>
+      <td>{{ shift.end }}</td>
+    </tr>
+  {% else %}
+    <tr>
+      <td colspan="3">No complete shifts in range.</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h3>Anomalies in Range</h3>
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Type</th>
+      <th>Detail</th>
+      <th>Time</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for anomaly in anomalies %}
+    <tr>
+      <td>{{ anomaly.user_name }}</td>
+      <td>{{ anomaly.kind }}</td>
+      <td>{{ anomaly.detail }}</td>
+      <td>{{ anomaly.occurred_at }}</td>
+    </tr>
+  {% else %}
+    <tr>
+      <td colspan="4">No anomalies in range.</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
