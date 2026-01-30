@@ -15,5 +15,14 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "supertest": "^6.3.4"
+  "name": "wro-timeclock",
+  "private": true,
+  "scripts": {
+    "dev:api": "wrangler dev --config apps/api/wrangler.toml",
+    "dev:web": "wrangler pages dev apps/web --port 8788",
+    "d1:local": "wrangler d1 migrations apply timeclock_db --local --config apps/api/wrangler.toml"
+  },
+  "devDependencies": {
+    "wrangler": "^3.83.0"
   }
 }
