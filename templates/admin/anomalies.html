@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Anomalies{% endblock %}
+
+{% block content %}
+<h2>Anomalies</h2>
+<form class="filters" method="get">
+  <div>
+    <label for="start">Start date</label>
+    <input type="date" id="start" name="start" value="{{ start_date }}" />
+  </div>
+  <div>
+    <label for="end">End date</label>
+    <input type="date" id="end" name="end" value="{{ end_date }}" />
+  </div>
+  <div style="margin-top: 20px;">
+    <button class="button" type="submit">Apply</button>
+  </div>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Type</th>
+      <th>Detail</th>
+      <th>Time</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for anomaly in anomalies %}
+    <tr>
+      <td>{{ anomaly.user_name }}</td>
+      <td>{{ anomaly.kind }}</td>
+      <td>{{ anomaly.detail }}</td>
+      <td>{{ anomaly.occurred_at }}</td>
+    </tr>
+  {% else %}
+    <tr>
+      <td colspan="4">No anomalies in range.</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

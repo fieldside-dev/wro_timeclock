@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<h2>Users</h2>
+<a class="button" href="{{ url_for('admin_user_new') }}">Create user</a>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Admin</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for user in users %}
+    <tr>
+      <td>{{ user.name }}</td>
+      <td>{{ 'Yes' if user.is_admin else 'No' }}</td>
+      <td>{{ 'Enabled' if user.enabled else 'Disabled' }}</td>
+      <td>
+        <form class="inline" action="{{ url_for('admin_user_toggle', user_id=user.id) }}" method="post">
+          <button class="button secondary" type="submit">
+            {{ 'Disable' if user.enabled else 'Enable' }}
+          </button>
+        </form>
+        <a class="button" href="{{ url_for('admin_user_reset_pin', user_id=user.id) }}">Reset PIN</a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

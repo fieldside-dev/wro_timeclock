@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Reset PIN{% endblock %}
+
+{% block content %}
+<h2>Reset PIN for {{ user.name }}</h2>
+<form method="post">
+  <label for="pin">New 4-digit PIN</label>
+  <input type="password" id="pin" name="pin" inputmode="numeric" pattern="\d{4}" maxlength="4" required />
+  <div style="margin-top: 12px;">
+    <button class="button" type="submit">Update PIN</button>
+    <a class="button secondary" href="{{ url_for('admin_users') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Create User{% endblock %}
+
+{% block content %}
+<h2>Create User</h2>
+<form method="post">
+  <label for="name">Name</label>
+  <input type="text" id="name" name="name" required />
+  <label for="pin">Initial 4-digit PIN</label>
+  <input type="password" id="pin" name="pin" inputmode="numeric" pattern="\d{4}" maxlength="4" required />
+  <label>
+    <input type="checkbox" name="is_admin" />
+    Admin access
+  </label>
+  <div style="margin-top: 12px;">
+    <button class="button" type="submit">Create user</button>
+    <a class="button secondary" href="{{ url_for('admin_users') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}
