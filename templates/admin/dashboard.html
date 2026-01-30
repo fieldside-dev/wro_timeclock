@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+<p>Use the navigation to manage users and review punches, shifts, and anomalies.</p>
+<ul>
+  <li><a href="{{ url_for('admin_users') }}">Manage users</a></li>
+  <li><a href="{{ url_for('admin_punches') }}">View punches &amp; shifts</a></li>
+  <li><a href="{{ url_for('admin_anomalies') }}">View anomalies</a></li>
+</ul>
+{% endblock %}
