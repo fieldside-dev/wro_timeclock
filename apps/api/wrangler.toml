@@ -11,4 +11,4 @@ EMAIL_FROM = "timeclock@example.com"
 [[d1_databases]]
 binding = "DB"
 database_name = "timeclock_db"
-database_id = "REPLACE_WITH_REMOTE_DATABASE_ID"
+database_id = "7e91f98e-31f4-4f19-82f5-3517ef8aef94"
