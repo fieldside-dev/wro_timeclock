@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WRO Timeclock Admin</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: #f8fafc;
+        color: #0f172a;
+      }
+      main { max-width: 920px; margin: 1.2rem auto; padding: 0 1rem 2rem; }
+      .top { display: flex; justify-content: space-between; align-items: center; }
+      a { color: #2563eb; text-decoration: none; font-weight: 600; }
+      .card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1rem;
+        margin-top: 1rem;
+      }
+      h1, h2, h3 { margin: 0 0 0.7rem; }
+      p { margin: 0 0 0.65rem; color: #475569; }
+      label { display: block; margin: 0.65rem 0 0.25rem; font-weight: 600; }
+      input, button, textarea {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 0.6rem 0.75rem;
+        font: inherit;
+      }
+      button { cursor: pointer; font-weight: 600; background: #0ea5e9; border-color: #0ea5e9; color: #fff; }
+      button.secondary { background: #fff; color: #0f172a; }
+      .row { display: grid; gap: 0.75rem; }
+      .two { grid-template-columns: 1fr; }
+      .three { grid-template-columns: 1fr; }
+      @media (min-width: 760px) {
+        .two { grid-template-columns: 1fr 1fr; }
+        .three { grid-template-columns: 1fr 1fr 1fr; }
+      }
+      .message { min-height: 1.2rem; margin-top: 0.6rem; }
+      .ok { color: #047857; }
+      .err { color: #b91c1c; }
+      pre {
+        margin: 0;
+        background: #020617;
+        color: #e2e8f0;
+        border-radius: 10px;
+        padding: 0.8rem;
+        overflow: auto;
+      }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { text-align: left; padding: 0.55rem; border-bottom: 1px solid #e2e8f0; }
+      th { font-size: 0.85rem; text-transform: uppercase; color: #475569; }
+      td code { font-size: 0.85rem; }
+      .actions { display: flex; gap: 0.45rem; }
+      .actions button { width: auto; font-size: 0.88rem; padding: 0.45rem 0.7rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="top">
+        <h1>Admin Console</h1>
+        <a href="/index.html">← Punch UI</a>
+      </div>
+
+      <section class="card">
+        <h2>Authorization</h2>
+        <p>Optional Bearer token added to all admin and bootstrap requests.</p>
+        <label for="admin-token">Admin token</label>
+        <input id="admin-token" type="password" placeholder="Paste token if required" />
+      </section>
+
+      <section class="card">
+        <h2>Bootstrap admin</h2>
+        <p>Calls <code>POST /api/bootstrap</code>.</p>
+        <form id="bootstrap-form" class="row">
+          <div class="row two">
+            <div>
+              <label for="bootstrap-name">Name</label>
+              <input id="bootstrap-name" name="name" required />
+            </div>
+            <div>
+              <label for="bootstrap-pin">PIN</label>
+              <input id="bootstrap-pin" name="pin" required />
+            </div>
+          </div>
+          <label for="bootstrap-email">Email (optional)</label>
+          <input id="bootstrap-email" name="email" type="email" />
+          <button type="submit">Bootstrap admin</button>
+        </form>
+        <div id="bootstrap-message" class="message"></div>
+      </section>
+
+      <section class="card">
+        <h2>Create user</h2>
+        <p>Calls <code>POST /api/admin/users</code>.</p>
+        <form id="create-form" class="row">
+          <div class="row three">
+            <div>
+              <label for="create-name">Display name</label>
+              <input id="create-name" name="display_name" required />
+            </div>
+            <div>
+              <label for="create-pin">PIN</label>
+              <input id="create-pin" name="pin" required />
+            </div>
+            <div>
+              <label for="create-email">Email (optional)</label>
+              <input id="create-email" name="email" type="email" />
+            </div>
+          </div>
+          <button type="submit">Create user</button>
+        </form>
+        <div id="create-message" class="message"></div>
+      </section>
+
+      <section class="card">
+        <div class="top" style="margin-bottom: 0.5rem">
+          <h2>Users</h2>
+          <button id="refresh-users" class="secondary" style="width: auto">Refresh list</button>
+        </div>
+        <p>Lists users via <code>GET /api/admin/users</code>. Disable/reset actions are row-level buttons.</p>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-body">
+              <tr><td colspan="5">No users loaded.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="users-message" class="message"></div>
+      </section>
+
+      <section class="card">
+        <h3>Latest API response</h3>
+        <pre id="response">No API response yet.</pre>
+      </section>
+    </main>
+
+    <script>
+      const responseEl = document.getElementById('response');
+      const usersBody = document.getElementById('users-body');
+      const adminTokenInput = document.getElementById('admin-token');
+
+      function setMessage(id, text, ok) {
+        const el = document.getElementById(id);
+        el.textContent = text || '';
+        el.className = `message ${ok ? 'ok' : 'err'}`;
+      }
+
+      function getAdminHeaders() {
+        const token = adminTokenInput.value.trim();
+        return token ? { Authorization: `Bearer ${token}` } : {};
+      }
+
+      async function callApi(path, { method = 'GET', body } = {}) {
+        const res = await fetch(path, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAdminHeaders(),
+          },
+          body: body ? JSON.stringify(body) : undefined,
+        });
+
+        const data = await res.json().catch(() => ({}));
+        responseEl.textContent = JSON.stringify(data, null, 2);
+
+        if (!res.ok) {
+          throw new Error(data.message || `Request failed (${res.status})`);
+        }
+        return data;
+      }
+
+      function normalizeUsers(payload) {
+        if (Array.isArray(payload)) return payload;
+        if (Array.isArray(payload.users)) return payload.users;
+        if (Array.isArray(payload.results)) return payload.results;
+        return [];
+      }
+
+      function readUserId(user) {
+        return user.id || user.user_id || user.userId || user.uuid || '';
+      }
+
+      function readUserName(user) {
+        return user.display_name || user.name || user.full_name || '—';
+      }
+
+      function readUserEmail(user) {
+        return user.email || '—';
+      }
+
+      function readUserStatus(user) {
+        if (typeof user.active === 'boolean') return user.active ? 'active' : 'disabled';
+        if (user.disabled_at || user.is_disabled) return 'disabled';
+        return user.status || 'active';
+      }
+
+      function renderUsers(users) {
+        if (!users.length) {
+          usersBody.innerHTML = '<tr><td colspan="5">No users returned.</td></tr>';
+          return;
+        }
+
+        usersBody.innerHTML = '';
+        users.forEach((user) => {
+          const id = readUserId(user);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><code>${id || '—'}</code></td>
+            <td>${readUserName(user)}</td>
+            <td>${readUserEmail(user)}</td>
+            <td>${readUserStatus(user)}</td>
+            <td>
+              <div class="actions">
+                <button type="button" data-action="disable" data-id="${id}">Disable</button>
+                <button type="button" data-action="reset" data-id="${id}">Reset PIN</button>
+              </div>
+            </td>
+          `;
+          usersBody.appendChild(tr);
+        });
+      }
+
+      async function loadUsers() {
+        setMessage('users-message', '', true);
+        try {
+          const payload = await callApi('/api/admin/users');
+          const users = normalizeUsers(payload);
+          renderUsers(users);
+          setMessage('users-message', `Loaded ${users.length} user(s).`, true);
+        } catch (error) {
+          setMessage('users-message', error.message, false);
+        }
+      }
+
+      document.getElementById('bootstrap-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        setMessage('bootstrap-message', '', true);
+        const form = event.currentTarget;
+        const payload = {
+          name: form.name.value.trim(),
+          pin: form.pin.value.trim(),
+          email: form.email.value.trim() || undefined,
+        };
+
+        try {
+          await callApi('/api/bootstrap', { method: 'POST', body: payload });
+          setMessage('bootstrap-message', 'Bootstrap request submitted.', true);
+          form.reset();
+        } catch (error) {
+          setMessage('bootstrap-message', error.message, false);
+        }
+      });
+
+      document.getElementById('create-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        setMessage('create-message', '', true);
+        const form = event.currentTarget;
+        const payload = {
+          display_name: form.display_name.value.trim(),
+          pin: form.pin.value.trim(),
+          email: form.email.value.trim() || undefined,
+        };
+
+        try {
+          await callApi('/api/admin/users', { method: 'POST', body: payload });
+          setMessage('create-message', 'User created.', true);
+          form.reset();
+          await loadUsers();
+        } catch (error) {
+          setMessage('create-message', error.message, false);
+        }
+      });
+
+      document.getElementById('refresh-users').addEventListener('click', loadUsers);
+
+      usersBody.addEventListener('click', async (event) => {
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+
+        const { action, id } = button.dataset;
+        if (!id) {
+          setMessage('users-message', 'User ID missing in row data.', false);
+          return;
+        }
+
+        const endpoint =
+          action === 'disable'
+            ? `/api/admin/users/${encodeURIComponent(id)}/disable`
+            : `/api/admin/users/${encodeURIComponent(id)}/reset-pin`;
+
+        const body =
+          action === 'reset'
+            ? { pin: prompt('Enter the new PIN for this user:') || '' }
+            : undefined;
+
+        if (action === 'reset' && !body.pin) {
+          setMessage('users-message', 'Reset PIN cancelled.', false);
+          return;
+        }
+
+        try {
+          await callApi(endpoint, { method: 'POST', body });
+          setMessage('users-message', action === 'disable' ? 'User disabled.' : 'PIN reset.', true);
+          await loadUsers();
+        } catch (error) {
+          setMessage('users-message', error.message, false);
+        }
+      });
+    </script>
+  </body>
+</html>
