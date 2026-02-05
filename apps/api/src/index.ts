@@ -45,9 +45,30 @@ const jsonResponse = (body: unknown, init?: ResponseInit) =>
   new Response(JSON.stringify(body, null, 2), {
     headers: {
       'content-type': 'application/json; charset=utf-8',
+      // Helps avoid caching of sensitive responses by browsers/proxies.
+      'cache-control': 'no-store',
     },
     ...init,
   });
+
+/**
+ * Shared-token guard (for admin/report endpoints).
+ * Accepts:
+ *  - Authorization: Bearer <token>
+ *  - x-api-key: <token>
+ *  - x-bootstrap-token: <token>   (kept for backwards-compat with your bootstrap route)
+ */
+const requireBootstrapToken = (request: Request, env: Env) => {
+  const token =
+    request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
+    request.headers.get('x-api-key') ??
+    request.headers.get('x-bootstrap-token');
+
+  if (!env.BOOTSTRAP_TOKEN || !token || token !== env.BOOTSTRAP_TOKEN) {
+    return jsonResponse({ error: 'Unauthorized' }, { status: 401 });
+  }
+  return null;
+};
 
 const parseDateInput = (value: string | null) => {
   if (!value) return null;
@@ -302,16 +323,16 @@ export default {
     }
 
     if (url.pathname === '/api/bootstrap' && request.method === 'POST') {
-      const body = (await parseJsonBody(request)) as { token?: string; name?: string; pin?: string } | null;
-      const providedToken =
-        request.headers.get('x-bootstrap-token') ??
-        request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
-        body?.token ??
-        '';
+      // Guard bootstrap with token (now centralized).
+      const denied = requireBootstrapToken(request, env);
+      if (denied) return denied;
 
-      if (!env.BOOTSTRAP_TOKEN || providedToken !== env.BOOTSTRAP_TOKEN) {
-        return jsonResponse({ error: 'Unauthorized' }, { status: 401 });
-      }
+      const body = (await parseJsonBody(request)) as { token?: string; name?: string; pin?: string } | null;
+
+      // NOTE: We no longer accept the token from body here, because it encourages
+      // logging/accidental leakage in request bodies. If you *want* to keep it,
+      // you can add body?.token back into requireBootstrapToken.
+      // If you rely on body.token today, re-enable it by uncommenting in requireBootstrapToken.
 
       const userSchema = await getUserSchema(env);
       const adminCountRow = await env.DB.prepare(
@@ -566,6 +587,10 @@ export default {
     }
 
     if (url.pathname === '/api/report' || url.pathname === '/api/report.csv') {
+      // Protect reports with the shared token.
+      const denied = requireBootstrapToken(request, env);
+      if (denied) return denied;
+
       const start = url.searchParams.get('start');
       const end = url.searchParams.get('end');
       const range = getRangeBounds(start, end, timeZone);
@@ -602,6 +627,7 @@ export default {
         return new Response(toCsv(rows), {
           headers: {
             'content-type': 'text/csv; charset=utf-8',
+            'cache-control': 'no-store',
           },
         });
       }
